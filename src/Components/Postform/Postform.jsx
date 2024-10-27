@@ -8,7 +8,7 @@ import Select from '../Header/Select'
 import RTE from "../RTE";
 import Button from "../Header/Button";
 import { useSelector } from "react-redux";
-
+import { Link } from "react-router-dom";
 
 export default function PostForm({ post }) {
     const { register, handleSubmit, watch, setValue, control, getValues } = useForm({

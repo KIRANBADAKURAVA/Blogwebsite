@@ -2,17 +2,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import service from "../appwrite/database_service";
-import Container from'../Components/Container/Container'
+import Container from '../Components/Container/Container';
 import parse from "html-react-parser";
-
-
+import { Link } from "react-router-dom";
+import Button from "../Components/Header/Button";
 export default function Post() {
     const [post, setPost] = useState(null);
     const { slug } = useParams();
     const navigate = useNavigate();
-
     const userData = useSelector((state) => state.auth.data);
-
     const isAuthor = post && userData ? post.userId === userData.$id : false;
 
     useEffect(() => {
@@ -20,8 +18,10 @@ export default function Post() {
             service.getPost(slug).then((post) => {
                 if (post) setPost(post);
                 else navigate("/");
-            });
-        } else navigate("/");
+            }).catch(error => console.error("Error fetching post:", error));
+        } else {
+            navigate("/");
+        }
     }, [slug, navigate]);
 
     const deletePost = () => {
@@ -29,8 +29,10 @@ export default function Post() {
             if (status) {
                 service.deleteFile(post.featuredImage);
                 navigate("/");
+            } else {
+                console.error("Failed to delete post.");
             }
-        });
+        }).catch(error => console.error("Error deleting post:", error));
     };
 
     return post ? (
@@ -42,7 +44,6 @@ export default function Post() {
                         alt={post.title}
                         className="rounded-xl"
                     />
-
                     {isAuthor && (
                         <div className="absolute right-6 top-6">
                             <Link to={`/edit-post/${post.$id}`}>
@@ -61,7 +62,7 @@ export default function Post() {
                 </div>
                 <div className="browser-css">
                     {parse(post.content)}
-                    </div>
+                </div>
             </Container>
         </div>
     ) : null;
